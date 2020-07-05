@@ -9,8 +9,13 @@ fn main() -> Result<(), systray::Error> {
     app.set_tooltip(&"Proxy Toggle".to_string())?;
     app.set_icon_from_file("assets\\skull-icon.ico")?;
 
-    app.add_menu_item("Proxy state", |_| {
-        println!("Enabled|Disabled");
+    app.add_menu_item("Proxy enable", |_| {
+        println!("Enabled");
+        Ok::<_, systray::Error>(())
+    })?;
+
+    app.add_menu_item("Proxy disable", |_| {
+        println!("Disabled");
         Ok::<_, systray::Error>(())
     })?;
 
