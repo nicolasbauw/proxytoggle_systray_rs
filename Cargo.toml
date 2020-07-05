@@ -1,5 +1,5 @@
 [package]
-name = "proxyoggle"
+name = "proxytoggle"
 version = "0.1.0"
 authors = ["Nicolas BAUW <nbauw@hotmail.com>"]
 edition = "2018"
