@@ -45,13 +45,13 @@ fn create_systray() -> Result<(), systray::Error> {
 
 fn get_proxy() -> u32 {
     let hkcu = RegKey::predef(HKEY_CURRENT_USER);
-    let ie_settings = hkcu.open_subkey("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings").unwrap();
+    let ie_settings = hkcu.open_subkey_with_flags("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", KEY_READ).unwrap();
     let proxy: u32 = ie_settings.get_value("ProxyEnable").unwrap();
     proxy
 }
 
 fn set_proxy(proxy: u32) {
     let hkcu = RegKey::predef(HKEY_CURRENT_USER);
-    let ie_settings = hkcu.open_subkey("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings").unwrap();
+    let ie_settings = hkcu.open_subkey_with_flags("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", KEY_SET_VALUE).unwrap();
     ie_settings.set_value("ProxyEnable", &proxy).unwrap();
 }
