@@ -1,4 +1,4 @@
-//#![windows_subsystem = "windows"]
+#![windows_subsystem = "windows"]
 use std::{env, fs, path::PathBuf, thread, time::Duration};
 use winreg::enums::*;
 use winreg::RegKey;
@@ -7,8 +7,8 @@ fn main() {
     // Creates temp file to store user requested proxy status (as we can't share data between threads with the systray crate...)
     // At start : user has not changed anything, so user status matches current system status.
     write_user_status(get_proxy());
-    // Checking system proxy every n seconds (in case of a nasty system policy sets it...)
-    check_proxy(5);
+    // Checking system proxy every second (in case of a nasty system policy sets it...)
+    check_proxy(1);
 
     // Creates the systray and menus
     if create_systray().is_err() {
