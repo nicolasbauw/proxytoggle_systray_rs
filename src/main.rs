@@ -19,11 +19,10 @@ fn main() {
 
 fn create_systray() -> Result<(), systray::Error> {
     let enabled_icon = include_bytes!("../assets/checkmark.ico");
-    let mut app;
-    match systray::Application::new() {
-        Ok(w) => app = w,
-        Err(_) => panic!("Can't create window!"),
-    }
+    let mut app = match systray::Application::new() {
+        Ok(w) => w,
+        Err(_) => return Err(systray::Error::UnknownError),
+    };
     app.set_tooltip(&"Proxy toggle".to_string())?;
     app.set_icon_from_buffer(enabled_icon, 128, 128)?;
 
