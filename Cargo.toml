@@ -7,4 +7,5 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-systray = "0.4.0"
+systray = { path = "../systray-rs" }
+winreg = "0.7"
