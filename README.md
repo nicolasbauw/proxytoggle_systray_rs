@@ -1,5 +1,8 @@
 # ProxyToggle
 
+[![Current Crates.io Version](https://img.shields.io/crates/v/proxytoggle.svg)](https://crates.io/crates/proxytoggle)
+[![Downloads badge](https://img.shields.io/crates/d/proxytoggle.svg)](https://crates.io/crates/proxytoggle)
+
 Systray application to enable or disable proxy. Checks system setting every second to fight eventual group policy.
 
 
