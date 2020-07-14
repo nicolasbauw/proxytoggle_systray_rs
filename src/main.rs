@@ -1,12 +1,18 @@
 #![windows_subsystem = "windows"]
 use std::{env, fs, path::PathBuf, thread, time::Duration};
+use win32_notification::NotificationBuilder;
 use winreg::enums::*;
 use winreg::RegKey;
 
 fn main() {
     // Creates temp file to store user requested proxy status (as we can't share data between threads with the systray crate...)
     // At start : user has not changed anything, so user status matches current system status.
-    write_user_status(get_proxy());
+    let start_status = get_proxy();
+    write_user_status(start_status);
+    match start_status {
+        0 => notification("Proxy currently disabled"),
+        _ => notification("Proxy currently enabled")
+    };
     // Checking system proxy every second (in case of a nasty system policy sets it...)
     check_proxy(1);
 
@@ -28,11 +34,13 @@ fn create_systray() -> Result<(), systray::Error> {
 
     app.add_menu_item("Proxy enable", move |_| {
         write_user_status(1);
+        notification("enabled");
         Ok::<_, systray::Error>(())
     })?;
 
     app.add_menu_item("Proxy disable", |_| {
         write_user_status(0);
+        notification("disabled");
         Ok::<_, systray::Error>(())
     })?;
 
@@ -103,4 +111,18 @@ fn write_user_status(status: u32) {
     d.push(env::temp_dir());
     d.push("user_status.txt");
     fs::write(d, status.to_string()).unwrap();
+}
+
+fn notification(message: &str) {
+    let notification = NotificationBuilder::new()
+        .title_text("System proxy")
+        .info_text(message)
+        .build()
+        .expect("Could not create notification");
+
+    notification.show().expect("Failed to show notification");
+    thread::sleep(Duration::from_secs(3));
+    notification
+        .delete()
+        .expect("Failed to delete notification");
 }

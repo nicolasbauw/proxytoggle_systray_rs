@@ -15,6 +15,7 @@ build = "build.rs"
 [dependencies]
 systray = { git = "https://github.com/nicolasbauw/systray-rs", tag="0.4.1" }
 winreg = "0.7"
+win32_notification = "0.1"
 
 [build-dependencies]
 winres = "0.1"
