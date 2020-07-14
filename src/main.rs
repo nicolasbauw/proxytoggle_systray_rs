@@ -46,6 +46,16 @@ fn create_systray() -> Result<(), systray::Error> {
 
     app.add_menu_separator()?;
 
+    app.add_menu_item("Display proxy status", |_| {
+        match get_proxy() {
+            0 => notification("Proxy currently disabled"),
+            _ => notification("Proxy currently enabled")
+        };
+        Ok::<_, systray::Error>(())
+    })?;
+
+    app.add_menu_separator()?;
+
     app.add_menu_item("Quit", |window| {
         window.quit();
         Ok::<_, systray::Error>(())
