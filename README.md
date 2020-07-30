@@ -10,6 +10,3 @@ In organizations, proxy settings can be set by a group policy. But, when you wor
 
 
 Here comes ProxyToggle : you have quick access to set the proxy status (enabled or disabled) in the systray, and the program checks the system proxy setting every second, to set it back to user setting, even if the group policy changed it.
-
-
-[Here](https://techblog.pagesperso-orange.fr/) you can download a compiled version.
