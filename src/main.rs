@@ -16,7 +16,7 @@ fn main() {
 fn create_systray() -> Result<(), systray::Error> {
     let enabled_icon = include_bytes!("../assets/checkmark.ico");
     // To share user proxy status between threads and closures
-    let user_status = Arc::new(Mutex::new(proxy::get()));
+    let user_status = Arc::new(Mutex::new(proxy::get().unwrap()));
 
     // Checking system proxy every second (in case of a nasty system policy sets it...)
     let us = Arc::clone(&user_status);
@@ -86,7 +86,7 @@ fn notification(message: &'static str) {
 }
 
 fn status_notification() {
-    if let 0 = proxy::get() {
+    if let Ok(0) = proxy::get() {
         notification("Proxy currently disabled")
     } else {
         notification("Proxy currently enabled")
