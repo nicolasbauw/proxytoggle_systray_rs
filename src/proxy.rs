@@ -1,4 +1,4 @@
-use std::{ thread, time::Duration, sync::Arc, sync::Mutex };
+use std::{sync::Arc, sync::Mutex, thread, time::Duration};
 use winreg::enums::*;
 use winreg::RegKey;
 

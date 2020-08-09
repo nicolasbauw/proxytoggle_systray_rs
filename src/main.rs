@@ -1,6 +1,6 @@
 #![windows_subsystem = "windows"]
 mod proxy;
-use std::{ thread, time::Duration, sync::Mutex, sync::Arc, process };
+use std::{process, sync::Arc, sync::Mutex, thread, time::Duration};
 use win32_notification::NotificationBuilder;
 
 fn main() {
@@ -16,7 +16,7 @@ fn main() {
 fn create_systray() -> Result<(), systray::Error> {
     let enabled_icon = include_bytes!("../assets/checkmark.ico");
     // To share user proxy status between threads and closures
-    let user_status =Arc::new(Mutex::new(proxy::get()));
+    let user_status = Arc::new(Mutex::new(proxy::get()));
 
     // Checking system proxy every second (in case of a nasty system policy sets it...)
     let us = Arc::clone(&user_status);
@@ -66,16 +66,16 @@ fn create_systray() -> Result<(), systray::Error> {
 fn notification(message: &'static str) {
     thread::spawn(move || {
         let notification = NotificationBuilder::new()
-        .title_text("System proxy")
-        .info_text(message)
-        .build()
-        .expect("Could not create notification");
+            .title_text("System proxy")
+            .info_text(message)
+            .build()
+            .expect("Could not create notification");
 
-    notification.show().expect("Failed to show notification");
-    thread::sleep(Duration::from_secs(3));
-    notification
-        .delete()
-        .expect("Failed to delete notification");
+        notification.show().expect("Failed to show notification");
+        thread::sleep(Duration::from_secs(3));
+        notification
+            .delete()
+            .expect("Failed to delete notification");
     });
 }
 
