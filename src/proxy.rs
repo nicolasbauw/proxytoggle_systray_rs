@@ -1,4 +1,4 @@
-use std::{env, fs, path::PathBuf, thread, time::Duration};
+use std::{ thread, time::Duration, sync::Arc, sync::Mutex };
 use winreg::enums::*;
 use winreg::RegKey;
 
@@ -26,18 +26,13 @@ pub fn set(proxy: u32) {
 }
 
 // interval : delay (in seconds) between checks (does system setting matches requested user setting ?)
-pub fn check(interval: u64) {
+pub fn check(interval: u64, user_status: Arc<Mutex<u32>>) {
     thread::spawn(move || {
         let check_interval = Duration::new(interval, 0);
         loop {
             thread::sleep(check_interval);
-            let mut d = PathBuf::new();
-            d.push(env::temp_dir());
-            d.push("user_status.txt");
-            let user_proxy_state: u32 = String::from_utf8(fs::read(d).unwrap())
-                .unwrap()
-                .parse()
-                .unwrap();
+            let us = user_status.lock().unwrap();
+            let user_proxy_state: u32 = *us;
             #[cfg(debug_assertions)]
             {
                 println!(

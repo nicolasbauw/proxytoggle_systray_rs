@@ -1,25 +1,27 @@
 #![windows_subsystem = "windows"]
 mod proxy;
-use std::{env, fs, path::PathBuf, thread, time::Duration};
+use std::{ thread, time::Duration, sync::Mutex, sync::Arc, process };
 use win32_notification::NotificationBuilder;
 
 fn main() {
-    // Creates temp file to store user requested proxy status (as we can't share data between threads with the systray crate...)
-    // At start : user has not changed anything, so user status matches current system status.
-    write_user_status(proxy::get());
+    // At start : displays current proxy status
     status_notification();
-    // Checking system proxy every second (in case of a nasty system policy sets it...)
-    proxy::check(1);
 
     // Creates the systray and menus
     if create_systray().is_err() {
-        println!("Systray creation error");
-        return;
+        process::exit(1);
     };
 }
 
 fn create_systray() -> Result<(), systray::Error> {
     let enabled_icon = include_bytes!("../assets/checkmark.ico");
+    // To share user proxy status between threads and closures
+    let user_status =Arc::new(Mutex::new(proxy::get()));
+
+    // Checking system proxy every second (in case of a nasty system policy sets it...)
+    let us = Arc::clone(&user_status);
+    proxy::check(1, us);
+
     let mut app = match systray::Application::new() {
         Ok(w) => w,
         Err(_) => return Err(systray::Error::UnknownError),
@@ -27,14 +29,18 @@ fn create_systray() -> Result<(), systray::Error> {
     app.set_tooltip(&"Proxy toggle".to_string())?;
     app.set_icon_from_buffer(enabled_icon, 128, 128)?;
 
-    app.add_menu_item("Proxy enable", |_| {
-        write_user_status(1);
+    let us = Arc::clone(&user_status);
+    app.add_menu_item("Proxy enable", move |_| {
+        let mut us = us.lock().unwrap();
+        *us = 1;
         notification("enabled");
         Ok::<_, systray::Error>(())
     })?;
 
-    app.add_menu_item("Proxy disable", |_| {
-        write_user_status(0);
+    let us = Arc::clone(&user_status);
+    app.add_menu_item("Proxy disable", move |_| {
+        let mut us = us.lock().unwrap();
+        *us = 0;
         notification("disabled");
         Ok::<_, systray::Error>(())
     })?;
@@ -55,13 +61,6 @@ fn create_systray() -> Result<(), systray::Error> {
 
     app.wait_for_message()?;
     Ok(())
-}
-
-fn write_user_status(status: u32) {
-    let mut d = PathBuf::new();
-    d.push(env::temp_dir());
-    d.push("user_status.txt");
-    fs::write(d, status.to_string()).unwrap();
 }
 
 fn notification(message: &'static str) {
