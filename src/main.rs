@@ -31,7 +31,10 @@ fn create_systray() -> Result<(), systray::Error> {
 
     let us = Arc::clone(&user_status);
     app.add_menu_item("Proxy enable", move |_| {
-        let mut us = us.lock().unwrap();
+        let mut us = match us.lock(){
+            Ok(u) => u,
+            Err(_) => return Err(systray::Error::UnknownError)
+        };
         *us = 1;
         notification("enabled");
         Ok::<_, systray::Error>(())
@@ -39,7 +42,10 @@ fn create_systray() -> Result<(), systray::Error> {
 
     let us = Arc::clone(&user_status);
     app.add_menu_item("Proxy disable", move |_| {
-        let mut us = us.lock().unwrap();
+        let mut us = match us.lock(){
+            Ok(u) => u,
+            Err(_) => return Err(systray::Error::UnknownError)
+        };
         *us = 0;
         notification("disabled");
         Ok::<_, systray::Error>(())
