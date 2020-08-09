@@ -75,13 +75,13 @@ fn notification(message: &'static str) {
             .title_text("System proxy")
             .info_text(message)
             .build()
-            .expect("Could not create notification");
+            .unwrap();
 
-        notification.show().expect("Failed to show notification");
+        notification.show().unwrap();
         thread::sleep(Duration::from_secs(3));
         notification
             .delete()
-            .expect("Failed to delete notification");
+            .unwrap();
     });
 }
 
