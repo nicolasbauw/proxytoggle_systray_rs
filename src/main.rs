@@ -80,8 +80,9 @@ fn notification(message: &'static str) {
 }
 
 fn status_notification() {
-    match proxy::get() {
-        0 => notification("Proxy currently disabled"),
-        _ => notification("Proxy currently enabled")
-    };
+    if let 0 = proxy::get() {
+        notification("Proxy currently disabled")
+    } else {
+        notification("Proxy currently enabled")
+    }
 }
