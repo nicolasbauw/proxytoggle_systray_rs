@@ -613,10 +613,9 @@ dependencies = [
 
 [[package]]
 name = "proxytoggle"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "systray",
- "win32_notification",
  "winreg",
  "winres",
 ]
@@ -775,15 +774,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d011071ae14a2f6671d0b74080ae0cd8ebf3a6f8c9589a2cd45f23126fe29724"
 dependencies = [
  "libc",
-]
-
-[[package]]
-name = "win32_notification"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "364cdb51ad77d274630365572788fd9653312eb271cf11735b995f4d672271ee"
-dependencies = [
- "winapi",
 ]
 
 [[package]]
