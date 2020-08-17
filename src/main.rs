@@ -24,7 +24,7 @@ fn create_systray() -> Result<(), systray::Error> {
         Ok(w) => w,
         Err(_) => return Err(systray::Error::UnknownError),
     };
-    app.set_tooltip(&"Proxy toggle".to_string())?;
+    app.set_tooltip("Proxy toggle")?;
     match proxy::get() {
         Ok(1) => app.set_icon_from_buffer(enabled_icon, 128, 128)?,
         Ok(0) => app.set_icon_from_buffer(disabled_icon, 128, 128)?,
