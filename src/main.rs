@@ -24,22 +24,22 @@ fn create_systray() -> Result<(), systray::Error> {
         Ok(w) => w,
         Err(_) => return Err(systray::Error::UnknownError),
     };
-    app.set_tooltip("Proxy toggle")?;
+
     match proxy::get() {
-        Ok(1) => app.set_icon_from_buffer(enabled_icon, 128, 128)?,
-        Ok(0) => app.set_icon_from_buffer(disabled_icon, 128, 128)?,
-        Ok(_) => app.set_icon_from_buffer(unknown_icon, 128, 128)?,
-        Err(_) => app.set_icon_from_buffer(unknown_icon, 128, 128)?
+        Ok(1) => { app.set_icon_from_buffer(enabled_icon, 128, 128)?; app.set_tooltip("Proxy disabled")?; },
+        Ok(0) => { app.set_icon_from_buffer(disabled_icon, 128, 128)?; app.set_tooltip("Proxy disabled")? },
+        _ => app.set_icon_from_buffer(unknown_icon, 128, 128)?,
     }
 
     let us = Arc::clone(&user_status);
     app.add_menu_item("Proxy enable", move |window| {
-        let mut us = match us.lock(){
+        let mut us = match us.lock() {
             Ok(u) => u,
             Err(_) => return Err(systray::Error::UnknownError)
         };
         *us = 1;
         window.set_icon_from_buffer(enabled_icon, 128, 128)?;
+        window.set_tooltip("Proxy enabled")?;
         Ok::<_, systray::Error>(())
     })?;
 
@@ -51,6 +51,7 @@ fn create_systray() -> Result<(), systray::Error> {
         };
         *us = 0;
         window.set_icon_from_buffer(disabled_icon, 128, 128)?;
+        window.set_tooltip("Proxy disabled")?;
         Ok::<_, systray::Error>(())
     })?;
 
