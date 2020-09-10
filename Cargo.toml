@@ -1,6 +1,6 @@
 [package]
 name = "proxytoggle"
-version = "0.6.0"
+version = "0.7.0"
 authors = ["Nicolas BAUW <nbauw@hotmail.com>"]
 edition = "2018"
 repository = "https://github.com/nicolasbauw/proxytoggle_systray_rs"
@@ -13,7 +13,8 @@ build = "build.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-systray = { git = "https://github.com/nicolasbauw/systray-rs", tag="0.4.1" }
+native-windows-gui = "1.0"
+native-windows-derive = "1.0"
 winreg = "0.7"
 
 [build-dependencies]
