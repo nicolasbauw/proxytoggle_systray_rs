@@ -1,67 +1,88 @@
-#![windows_subsystem = "windows"]
-mod proxy;
-use std::{process, sync::Arc, sync::Mutex};
+extern crate native_windows_gui as nwg;
+extern crate native_windows_derive as nwd;
 
-fn main() {
-    // Creates the systray and menus
-    if create_systray().is_err() {
-        process::exit(1);
-    };
+use nwd::NwgUi;
+use nwg::NativeUi;
+use std::{env, error::Error};
+mod proxy;
+
+#[derive(Default, NwgUi)]
+pub struct SystemTray {
+    #[nwg_control]
+    window: nwg::MessageWindow,
+
+    #[nwg_resource(source_file: Some("./assets/check-mark-16.ico"))]
+    proxy_on: nwg::Icon,
+
+    #[nwg_resource(source_file: Some("./assets/x-mark-16.ico"))]
+    proxy_off: nwg::Icon,
+
+    #[nwg_resource(source_file: Some("./assets/question-mark-16.ico"))]
+    proxy_unkn: nwg::Icon,
+
+    #[nwg_control(icon: Some(&data.proxy_unkn))]
+    #[nwg_events(OnContextMenu: [SystemTray::show_menu])]
+    tray: nwg::TrayNotification,
+
+    #[nwg_control(parent: window, popup: true)]
+    tray_menu: nwg::Menu,
+
+    #[nwg_control(parent: tray_menu, text: "Proxy ON")]
+    #[nwg_events(OnMenuItemSelected: [SystemTray::proxy_on])]
+    tray_item1: nwg::MenuItem,
+
+    #[nwg_control(parent: tray_menu, text: "Proxy OFF")]
+    #[nwg_events(OnMenuItemSelected: [SystemTray::proxy_off])]
+    tray_item2: nwg::MenuItem,
+
+    #[nwg_control(parent: tray_menu, text: "Exit")]
+    #[nwg_events(OnMenuItemSelected: [SystemTray::exit])]
+    tray_item3: nwg::MenuItem,
 }
 
-fn create_systray() -> Result<(), systray::Error> {
-    let enabled_icon = include_bytes!("../assets/check-mark-16.ico");
-    let disabled_icon = include_bytes!("../assets/x-mark-16.ico");
-    let unknown_icon = include_bytes!("../assets/question-mark-16.ico");
-    // To share user proxy status between threads and closures
-    let user_status = Arc::new(Mutex::new(proxy::get().unwrap_or(0)));
+impl SystemTray {
 
-    // Checking system proxy every second (in case of a nasty system policy sets it...)
-    let us = Arc::clone(&user_status);
-    proxy::check(1, us);
-
-    let mut app = match systray::Application::new() {
-        Ok(w) => w,
-        Err(_) => return Err(systray::Error::UnknownError),
-    };
-
-    match proxy::get() {
-        Ok(1) => { app.set_icon_from_buffer(enabled_icon, 128, 128)?; app.set_tooltip("Proxy disabled")?; },
-        Ok(0) => { app.set_icon_from_buffer(disabled_icon, 128, 128)?; app.set_tooltip("Proxy disabled")? },
-        _ => app.set_icon_from_buffer(unknown_icon, 128, 128)?,
+    fn show_menu(&self) {
+        let (x, y) = nwg::GlobalCursor::position();
+        self.tray_menu.popup(x, y);
     }
 
-    let us = Arc::clone(&user_status);
-    app.add_menu_item("Proxy enable", move |window| {
-        let mut us = match us.lock() {
-            Ok(u) => u,
-            Err(_) => return Err(systray::Error::UnknownError)
-        };
-        *us = 1;
-        window.set_icon_from_buffer(enabled_icon, 128, 128)?;
-        window.set_tooltip("Proxy enabled")?;
-        Ok::<_, systray::Error>(())
-    })?;
+    fn set_initial_icon (&self) -> Result<(), Box<dyn Error>> {
+        #[cfg(debug_assertions)]
+            {
+                println!(
+                    "Initial icon proxy state : {:?}\n",
+                    env::var("USER_PROXY_STATUS")
+                );
+            }
+        if let 0 = env::var("USER_PROXY_STATUS")?.parse()? { self.tray.set_icon(&self.proxy_off); } else { self.tray.set_icon(&self.proxy_on); }
+        Ok(())
+    }
 
-    let us = Arc::clone(&user_status);
-    app.add_menu_item("Proxy disable", move |window| {
-        let mut us = match us.lock(){
-            Ok(u) => u,
-            Err(_) => return Err(systray::Error::UnknownError)
-        };
-        *us = 0;
-        window.set_icon_from_buffer(disabled_icon, 128, 128)?;
-        window.set_tooltip("Proxy disabled")?;
-        Ok::<_, systray::Error>(())
-    })?;
+    fn proxy_on(&self) {
+        self.tray.set_icon(&self.proxy_on);
+        env::set_var("USER_PROXY_STATUS", "1");
+    }
+    
+    fn proxy_off(&self) {
+        self.tray.set_icon(&self.proxy_off);
+        env::set_var("USER_PROXY_STATUS", "0");
+    }
+    
+    fn exit(&self) {
+        nwg::stop_thread_dispatch();
+    }
 
-    app.add_menu_separator()?;
+}
 
-    app.add_menu_item("Quit", |window| {
-        window.quit();
-        Ok::<_, systray::Error>(())
-    })?;
+fn main() -> Result<(), Box<dyn Error>> {
+    // Setting initial status + starts periodic check
+    env::set_var("USER_PROXY_STATUS", proxy::get()?.to_string());
+    proxy::check(1);
 
-    app.wait_for_message()?;
+    nwg::init()?;
+    let ui = SystemTray::build_ui(Default::default())?;
+    ui.set_initial_icon()?;
+    nwg::dispatch_thread_events();
     Ok(())
 }
