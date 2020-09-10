@@ -1,4 +1,4 @@
-use std::{sync::Arc, sync::Mutex, thread, time::Duration, error::Error};
+use std::{env, thread, time::Duration, error::Error};
 use winreg::enums::*;
 use winreg::RegKey;
 
@@ -25,23 +25,22 @@ pub fn set(proxy: u32) -> Result<(), Box<dyn Error>> {
 }
 
 // interval : delay (in seconds) between checks (does system setting matches requested user setting ?)
-pub fn check(interval: u64, user_status: Arc<Mutex<u32>>) {
+pub fn check(interval: u64) {
     thread::spawn(move || {
         let check_interval = Duration::new(interval, 0);
         loop {
             thread::sleep(check_interval);
-            let us = user_status.lock().unwrap();
-            let user_proxy_state: u32 = *us;
+            let user_proxy_status: u32 = env::var("USER_PROXY_STATUS").unwrap().parse().unwrap();
             #[cfg(debug_assertions)]
             {
                 println!(
                     "System proxy : {}\nUser requested proxy state : {}\n",
                     get().unwrap(),
-                    user_proxy_state
+                    user_proxy_status
                 );
             }
-            if get().unwrap() != user_proxy_state {
-                set(user_proxy_state).unwrap();
+            if get().unwrap() != user_proxy_status {
+                set(user_proxy_status).unwrap();
             }
         }
     });
