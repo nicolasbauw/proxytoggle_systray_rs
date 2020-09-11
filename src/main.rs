@@ -1,3 +1,5 @@
+#![windows_subsystem = "windows"]
+
 extern crate native_windows_derive as nwd;
 extern crate native_windows_gui as nwg;
 
@@ -52,7 +54,7 @@ impl SystemTray {
         let initial_state = proxy::get()?;
         #[cfg(debug_assertions)]
         {
-            println!("Initial icon proxy state : {:?}\n", initial_state);
+            println!("Initial proxy state : {:?}\n", initial_state);
         }
         if let 0 = initial_state {
             self.tray.set_icon(&self.proxy_off);
