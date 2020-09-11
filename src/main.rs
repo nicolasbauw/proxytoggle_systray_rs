@@ -13,13 +13,8 @@ pub struct SystemTray {
     #[nwg_control]
     window: nwg::MessageWindow,
 
-    #[nwg_resource(source_file: Some("./assets/check-mark-16.ico"))]
     proxy_on: nwg::Icon,
-
-    #[nwg_resource(source_file: Some("./assets/x-mark-16.ico"))]
     proxy_off: nwg::Icon,
-
-    #[nwg_resource(source_file: Some("./assets/question-mark-16.ico"))]
     proxy_unkn: nwg::Icon,
 
     #[nwg_control(icon: Some(&data.proxy_unkn))]
@@ -87,10 +82,28 @@ impl SystemTray {
     }
 }
 
+fn load_icon(data: &[u8]) -> nwg::Icon {
+    let mut icon = nwg::Icon::default();
+
+    nwg::Icon::builder()
+        .source_bin(Some(data))
+        .strict(true)
+        .build(&mut icon)
+        .unwrap();
+
+    icon
+}
+
 fn main() -> Result<(), Box<dyn Error>> {
+    let _enabled_icon = include_bytes!("../assets/check-mark-16.ico");
+    let disabled_icon = include_bytes!("../assets/x-mark-16.ico");
+    let _unknown_icon = include_bytes!("../assets/question-mark-16.ico");
+
     // Building the systray
     nwg::init()?;
     let ui = SystemTray::build_ui(Default::default())?;
+    ui.proxy_off = load_icon(disabled_icon);
+
 
     // Setting initial icon + starts event loop
     ui.set_initial_icon()?;
