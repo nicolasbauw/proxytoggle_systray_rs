@@ -93,6 +93,7 @@ fn load_icon(data: &[u8]) -> Result<nwg::Icon, nwg::NwgError> {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
+    // Creating icons
     let enabled_icon = include_bytes!("../assets/check-mark-16.ico");
     let disabled_icon = include_bytes!("../assets/x-mark-16.ico");
     let unknown_icon = include_bytes!("../assets/question-mark-16.ico");
@@ -105,13 +106,14 @@ fn main() -> Result<(), Box<dyn Error>> {
     nwg::init()?;
     let ui = SystemTray::build_ui(Default::default())?;
     
-    // Setting initial icon + starts event loop
+    // Setting initial icon
     ui.set_initial_icon()?;
 
     // Setting initial status + starts periodic check
     let us = Arc::clone(&ui.user_proxy_status);
     proxy::check(1, us);
 
+    // Starts event loop
     nwg::dispatch_thread_events();
     Ok(())
 }
