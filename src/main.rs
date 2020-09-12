@@ -8,13 +8,22 @@ use nwg::NativeUi;
 use std::{error::Error, sync::Arc, sync::Mutex};
 mod proxy;
 
+/*const ENABLED_ICON: &[u8] = include_bytes!("../assets/check-mark-16.ico");
+const DISABLED_ICON: &[u8] = include_bytes!("../assets/x-mark-16.ico");
+const UNKNOWN_ICON: &[u8] = include_bytes!("../assets/question-mark-16.ico");*/
+
 #[derive(Default, NwgUi)]
 pub struct SystemTray {
     #[nwg_control]
     window: nwg::MessageWindow,
 
+    //#[nwg_resource(source_bin: Some(ENABLED_ICON))]
     proxy_on: nwg::Icon,
+
+    //#[nwg_resource(source_bin: Some(DISABLED_ICON))]
     proxy_off: nwg::Icon,
+
+    //#[nwg_resource(source_bin: Some(UNKNOWN_ICON))]
     proxy_unkn: nwg::Icon,
 
     #[nwg_control()]
@@ -101,7 +110,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     ui_data.proxy_on = load_icon(enabled_icon)?;
     ui_data.proxy_off = load_icon(disabled_icon)?;
     ui_data.proxy_unkn = load_icon(unknown_icon)?;
-
+    
     // Building the systray
     nwg::init()?;
     let ui = SystemTray::build_ui(Default::default())?;

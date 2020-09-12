@@ -13,8 +13,8 @@ build = "build.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-native-windows-gui = { version = "1.0", features = ["tray-notification", "message-window", "menu", "cursor"] }
-native-windows-derive = "1.0"
+native-windows-gui = { path = "../native-windows-gui/native-windows-gui", features = ["tray-notification", "message-window", "menu", "cursor"] }
+native-windows-derive = { path = "../native-windows-gui/native-windows-derive" }
 winreg = "0.7"
 
 [build-dependencies]
