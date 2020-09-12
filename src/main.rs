@@ -1,4 +1,4 @@
-//#![windows_subsystem = "windows"]
+#![windows_subsystem = "windows"]
 
 extern crate native_windows_derive as nwd;
 extern crate native_windows_gui as nwg;
@@ -8,25 +8,25 @@ use nwg::NativeUi;
 use std::{error::Error, sync::Arc, sync::Mutex};
 mod proxy;
 
-/*const ENABLED_ICON: &[u8] = include_bytes!("../assets/check-mark-16.ico");
+const ENABLED_ICON: &[u8] = include_bytes!("../assets/check-mark-16.ico");
 const DISABLED_ICON: &[u8] = include_bytes!("../assets/x-mark-16.ico");
-const UNKNOWN_ICON: &[u8] = include_bytes!("../assets/question-mark-16.ico");*/
+const UNKNOWN_ICON: &[u8] = include_bytes!("../assets/question-mark-16.ico");
 
 #[derive(Default, NwgUi)]
 pub struct SystemTray {
     #[nwg_control]
     window: nwg::MessageWindow,
 
-    //#[nwg_resource(source_bin: Some(ENABLED_ICON))]
+    #[nwg_resource(source_bin: Some(ENABLED_ICON))]
     proxy_on: nwg::Icon,
 
-    //#[nwg_resource(source_bin: Some(DISABLED_ICON))]
+    #[nwg_resource(source_bin: Some(DISABLED_ICON))]
     proxy_off: nwg::Icon,
 
-    //#[nwg_resource(source_bin: Some(UNKNOWN_ICON))]
+    #[nwg_resource(source_bin: Some(UNKNOWN_ICON))]
     proxy_unkn: nwg::Icon,
 
-    #[nwg_control()]
+    #[nwg_control(icon: Some(&data.proxy_unkn))]
     #[nwg_events(OnContextMenu: [SystemTray::show_menu])]
     tray: nwg::TrayNotification,
 
@@ -91,26 +91,7 @@ impl SystemTray {
     }
 }
 
-fn load_icon(data: &[u8]) -> Result<nwg::Icon, nwg::NwgError> {
-    let mut icon = nwg::Icon::default();
-
-    nwg::Icon::builder()
-        .source_bin(Some(data))
-        .strict(true)
-        .build(&mut icon)?;
-    Ok(icon)
-}
-
 fn main() -> Result<(), Box<dyn Error>> {
-    // Creating icons
-    let enabled_icon = include_bytes!("../assets/check-mark-16.ico");
-    let disabled_icon = include_bytes!("../assets/x-mark-16.ico");
-    let unknown_icon = include_bytes!("../assets/question-mark-16.ico");
-    let mut ui_data:  SystemTray = Default::default();
-    ui_data.proxy_on = load_icon(enabled_icon)?;
-    ui_data.proxy_off = load_icon(disabled_icon)?;
-    ui_data.proxy_unkn = load_icon(unknown_icon)?;
-    
     // Building the systray
     nwg::init()?;
     let ui = SystemTray::build_ui(Default::default())?;
