@@ -55,7 +55,11 @@ impl SystemTray {
     }
 
     fn set_initial_icon(&self) {
-        let initial_state = proxy::get().unwrap();
+        let initial_state = match proxy::get() {
+            Ok(0) => 0,
+            Ok(1) => 1,
+            _ => return
+        };
         #[cfg(debug_assertions)]
         {
             println!("Initial proxy state : {:?}\n", initial_state);
@@ -67,19 +71,28 @@ impl SystemTray {
             self.tray.set_icon(&self.proxy_on);
             self.tray.set_tip("Proxy is enabled");
         }
-        let mut us = self.user_proxy_status.lock().unwrap();
+        let mut us = match self.user_proxy_status.lock() {
+            Ok(us) => us,
+            _ => return
+        };
         *us = initial_state;
     }
 
     fn proxy_on(&self) {
-        let mut us = self.user_proxy_status.lock().unwrap();
+        let mut us = match self.user_proxy_status.lock() {
+            Ok(us) => us,
+            _ => return
+        };
         *us = 1;
         self.tray.set_icon(&self.proxy_on);
         self.tray.set_tip("Proxy is enabled");
     }
 
     fn proxy_off(&self) {
-        let mut us = self.user_proxy_status.lock().unwrap();
+        let mut us = match self.user_proxy_status.lock() {
+            Ok(us) => us,
+            _ => return
+        };
         *us = 0;
         self.tray.set_icon(&self.proxy_off);
         self.tray.set_tip("Proxy is disabled");
