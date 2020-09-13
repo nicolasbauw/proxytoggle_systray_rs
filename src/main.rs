@@ -8,9 +8,9 @@ use nwg::NativeUi;
 use std::{error::Error, sync::Arc, sync::Mutex};
 mod proxy;
 
-const ENABLED_ICON: &[u8] = include_bytes!("../assets/check-mark-16.ico");
-const DISABLED_ICON: &[u8] = include_bytes!("../assets/x-mark-16.ico");
-const UNKNOWN_ICON: &[u8] = include_bytes!("../assets/question-mark-16.ico");
+const ENABLED_ICON: &[u8] = include_bytes!("../assets/plus-16.ico");
+const DISABLED_ICON: &[u8] = include_bytes!("../assets/minus-16.ico");
+const UNKNOWN_ICON: &[u8] = include_bytes!("../assets/question-mark-4-16.ico");
 
 #[derive(Default, NwgUi)]
 pub struct SystemTray {
