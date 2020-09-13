@@ -27,7 +27,7 @@ pub struct SystemTray {
     proxy_unkn: nwg::Icon,
 
     #[nwg_control(icon: Some(&data.proxy_unkn))]
-    #[nwg_events(OnContextMenu: [SystemTray::show_menu])]
+    #[nwg_events(OnMousePress: [SystemTray::show_menu])]
     tray: nwg::TrayNotification,
 
     #[nwg_control(parent: window, popup: true)]
@@ -54,8 +54,8 @@ impl SystemTray {
         self.tray_menu.popup(x, y);
     }
 
-    fn set_initial_icon(&self) -> Result<(), Box<dyn Error>> {
-        let initial_state = proxy::get()?;
+    fn set_initial_icon(&self) {
+        let initial_state = proxy::get().unwrap();
         #[cfg(debug_assertions)]
         {
             println!("Initial proxy state : {:?}\n", initial_state);
@@ -69,7 +69,6 @@ impl SystemTray {
         }
         let mut us = self.user_proxy_status.lock().unwrap();
         *us = initial_state;
-        Ok(())
     }
 
     fn proxy_on(&self) {
@@ -97,7 +96,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let ui = SystemTray::build_ui(Default::default())?;
     
     // Setting initial icon
-    ui.set_initial_icon()?;
+    ui.set_initial_icon();
 
     // Setting initial status + starts periodic check
     let us = Arc::clone(&ui.user_proxy_status);
