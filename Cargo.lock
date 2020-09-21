@@ -20,7 +20,9 @@ checksum = "7fc7aa29613bd6a620df431842069224d8bc9011086b1db4c0e0cd47fa03ec9a"
 
 [[package]]
 name = "native-windows-derive"
-version = "1.0.2"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c39357a029a532c887fb1596e0f0498613d8dd119549d400569d61c048145ac6"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -29,7 +31,9 @@ dependencies = [
 
 [[package]]
 name = "native-windows-gui"
-version = "1.0.4"
+version = "1.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "62edd14cfb9c0390a19b809be2e4bdfe6de6bf8c10f678b4c7d2d42b379c0f69"
 dependencies = [
  "bitflags",
  "lazy_static",
@@ -84,9 +88,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "1.0.40"
+version = "1.0.41"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "963f7d3cc59b59b9325165add223142bbf1df27655d07789f109896d353d8350"
+checksum = "6690e3e9f692504b941dc6c3b188fd28df054f7fb8469ab40680df52fdcc842b"
 dependencies = [
  "proc-macro2",
  "quote",
